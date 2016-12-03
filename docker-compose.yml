@@ -1,0 +1,26 @@
+version: "2"
+services:
+  app:
+    image: kevineye/airplay-to-bluetooth
+    build: .
+    devices:
+      - /dev/bus/usb # or set a specific device
+    volumes:
+      - ./devices:/var/lib/bluetooth
+    network_mode: host
+    cap_add:
+      - NET_ADMIN
+    environment:
+      BT_DEVICE: B8:AD:3E:27:D0:8A # LG HBS750
+      # BT_DEVICE: B8:69:C2:86:D5:87 # JBL Xtreme
+      # BT_DEVICE: DF:2B:46:1E:47:AD # Red iblue
+
+  shell:
+    extends:
+      service: app
+    volumes:
+      - ./app:/app
+    stdin_open: true
+    tty: true
+    command: 'sh'
+    working_dir: /app

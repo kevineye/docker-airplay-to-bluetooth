@@ -1,0 +1,50 @@
+#!/usr/sbin/expect -f
+send_user "Attempting to connect to:\n"
+send_user "Device: $env(BT_DEVICE)\n"
+send_user "Pin:    $env(BT_PIN)\n\n"
+
+spawn bluetoothctl
+send "pairable on\n"
+send "agent on\n"
+expect "Agent registered"
+
+send "default-agent\n"
+expect "Default agent request successful"
+
+set timeout 3
+set paired False
+send "paired-devices\n"
+expect "Device $env(BT_DEVICE)" {
+  set paired True
+  send_user "Already paired\n"
+}
+set timeout -1
+
+if { $paired == False } {
+  send_user "Attempting to pair\n"
+  
+  expect "# "
+  send "scan on\n"
+  expect "Device *$env(BT_DEVICE)"
+  expect "# "
+  send "scan off\n"
+
+  expect "# "
+  send "trust $env(BT_DEVICE)\n"
+  expect "trust succeeded"
+
+  # some devices take a bit before they are pairable
+  sleep 2
+
+  expect "# "
+  send "pair $env(BT_DEVICE)\n"
+  expect "Enter PIN code:"
+  send "$env(BT_PIN)\n"
+  
+  expect "Pairing successful"
+}
+
+send_user "Attempting to connect\n"
+expect "# "
+send "connect $env(BT_DEVICE)\n"
+expect "# "
