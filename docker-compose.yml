@@ -11,9 +11,7 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      BT_DEVICE: B8:AD:3E:27:D0:8A # LG HBS750
-      # BT_DEVICE: B8:69:C2:86:D5:87 # JBL Xtreme
-      # BT_DEVICE: DF:2B:46:1E:47:AD # Red iblue
+      BT_DEVICE:
 
   shell:
     extends:

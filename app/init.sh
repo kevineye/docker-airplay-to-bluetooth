@@ -7,6 +7,7 @@ if [ -z "$BT_DEVICE" ]; then
 
   # list pairable devices
   hcitool scan
+  echo "Re-run with '-e BT_DEVICE=<device id>' to pair with a device."
   
 else
 
