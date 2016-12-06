@@ -1,35 +1,21 @@
 #!/bin/sh
 
-hciconfig hci0 reset
 hciconfig hci0 up
 
-if [ -z "$BT_DEVICE" ]; then
+rm -f /run/dbus/pid
+dbus-daemon --system --fork
 
-  # list pairable devices
-  hcitool scan
-  echo "Re-run with '-e BT_DEVICE=<device id>' to pair with a device."
-  
-else
+/usr/lib/bluetooth/bluetoothd --plugin=a2dp -n &
 
-  # start up with a specific device
+pulseaudio --log-level=1 --log-target=stderr --disallow-exit=true --exit-idle-time=-1 &
 
-  rm -f /run/dbus/pid
-  dbus-daemon --system --fork
-
-  avahi-daemon &
-
-  sed -i 's/device ".*"/device "'$BT_DEVICE'"/' /etc/asound.conf
-  /usr/lib/bluetooth/bluetoothd --plugin=a2dp -n &
-  /usr/bin/bluealsa &
-  sleep 5
-  
-  hciconfig hci0 name $BT_HOST_NAME
+if [ "$*" == "pair" ]; then
   hciconfig hci0 sspmode 0
   hciconfig hci0 piscan
-  /app/bluetooth-connect.exp
-
-  sleep 5
-  
-  shairport-sync -v -a "$AIRPLAY_NAME"
-
+  sleep 2
+  bluetoothctl
+elif [ -z "$*" ]; then
+  wait
+else
+  exec sh -c "$*"
 fi

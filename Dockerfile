@@ -1,35 +1,16 @@
-FROM binhex/arch-base
+FROM alpine:edge
 MAINTAINER Kevin Eye <kevineye@gmail.com>
 
-RUN pacman --noconfirm -Sy --needed \
-        base-devel \
-        git \
+RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories \
+ && apk -U add \
         bluez \
-        bluez-libs \
-        bluez-utils \
-        bluez-firmware \
-        alsa-utils \
-        expect \
-        shairport-sync
+        pulseaudio \
+        pulseaudio-bluez \
+        pulseaudio-utils \
+        pulseaudio-alsa \
+ && echo 'load-module module-switch-on-connect' >> /etc/pulse/default.pa
 
-RUN cd /tmp \
- && curl -LO https://aur.archlinux.org/cgit/aur.git/snapshot/bluez-alsa-git.tar.gz \
- && tar xzvf bluez-alsa-git.tar.gz \
- && cd bluez-alsa-git/ \
- && echo 'nobody ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/nobody \
- && chown -R nobody .
-
-RUN cd /tmp/bluez-alsa-git \
- && su nobody -c 'makepkg --noconfirm --needed -si' \
- && rm /etc/sudoers.d/nobody \
- && mkdir /var/run/dbus
-
-ENV BT_HOST_NAME Docker
-ENV BT_DEVICE ""
-ENV BT_PIN 0000
-ENV AIRPLAY_NAME Docker
-
-ADD asound.conf /etc/asound.conf
 ADD app /app
 
-CMD /app/init.sh
+ENTRYPOINT [ "/app/init.sh" ]
+CMD [ ]

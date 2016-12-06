@@ -10,14 +10,27 @@ services:
     network_mode: host
     cap_add:
       - NET_ADMIN
-    environment:
-      BT_DEVICE:
+
+  pair:
+    extends:
+      service: app
+    stdin_open: true
+    tty: true
+    command: pair
+
+  test-play:
+    extends:
+      service: app
+    volumes:
+      - ./test:/tmp/test
+    command: 'paplay /tmp/test/test.wav'
 
   shell:
     extends:
       service: app
     volumes:
       - ./app:/app
+      - ./test:/tmp/test
     stdin_open: true
     tty: true
     command: 'sh'
