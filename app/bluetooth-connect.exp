@@ -1,50 +1,58 @@
-#!/usr/sbin/expect -f
-send_user "Attempting to connect to:\n"
-send_user "Device: $env(BT_DEVICE)\n"
-send_user "Pin:    $env(BT_PIN)\n\n"
+#!/usr/bin/expect -f
+
+send_user -- "----> Attempting to connect to: $env(BT_DEVICE) with PIN $env(BT_PIN)\n\n"
+
+set timeout -1
 
 spawn bluetoothctl
+expect -re {(?:^|\r|\n).{0,8}\[bluetooth\].{0,8}# }
 send "pairable on\n"
+expect -re {(?:^|\r|\n).{0,8}\[bluetooth\].{0,8}# }
 send "agent on\n"
 expect "Agent registered"
 
+expect -re {(?:^|\r|\n).{0,8}\[bluetooth\].{0,8}# }
 send "default-agent\n"
 expect "Default agent request successful"
 
 set timeout 3
 set paired False
+expect -re {(?:^|\r|\n).{0,8}\[bluetooth\].{0,8}# }
 send "paired-devices\n"
 expect "Device $env(BT_DEVICE)" {
   set paired True
-  send_user "Already paired\n"
+  send_user "\n----> Already paired\n"
 }
 set timeout -1
 
 if { $paired == False } {
-  send_user "Attempting to pair\n"
-  
-  expect "# "
+  send_user "\n----> Attempting to pair\n"
+
+  expect -re {(?:^|\r|\n).{0,8}\[bluetooth\].{0,8}# }
   send "scan on\n"
   expect "Device *$env(BT_DEVICE)"
-  expect "# "
+  expect -re {(?:^|\r|\n).{0,8}\[bluetooth\].{0,8}# }
   send "scan off\n"
 
-  expect "# "
+  expect -re {(?:^|\r|\n).{0,8}\[bluetooth\].{0,8}# }
   send "trust $env(BT_DEVICE)\n"
   expect "trust succeeded"
 
   # some devices take a bit before they are pairable
   sleep 2
 
-  expect "# "
+  expect -re {(?:^|\r|\n).{0,8}\[bluetooth\].{0,8}# }
   send "pair $env(BT_DEVICE)\n"
   expect "Enter PIN code:"
   send "$env(BT_PIN)\n"
-  
+
   expect "Pairing successful"
+  send_user "\n----> Pairing succesful\n"
 }
 
-send_user "Attempting to connect\n"
-expect "# "
+send_user "\n----> Attempting to connect\n"
+expect -re {(?:^|\r|\n).{0,8}\[bluetooth\].{0,8}# }
 send "connect $env(BT_DEVICE)\n"
-expect "# "
+expect -re {(?:^|\r|\n).{0,8}\[[^\]]+\].{0,8}# }
+
+send_user "\n----> Connection successful\n"

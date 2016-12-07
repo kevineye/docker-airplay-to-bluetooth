@@ -2,20 +2,31 @@
 
 hciconfig hci0 up
 
-rm -f /run/dbus/pid
-dbus-daemon --system --fork
+if [ -z "$BT_DEVICE" ]; then
 
-/usr/lib/bluetooth/bluetoothd --plugin=a2dp -n &
+  # list pairable devices
+  hcitool scan
+  echo "Re-run with '-e BT_DEVICE=<device id>' to pair with a device."
 
-pulseaudio --log-level=1 --log-target=stderr --disallow-exit=true --exit-idle-time=-1 &
+else
 
-if [ "$*" == "pair" ]; then
+  # start up with a specific device
+
+  rm -f /var/run/dbus.pid
+  dbus-daemon --system --fork
+
+  /usr/lib/bluetooth/bluetoothd --plugin=a2dp -n &
+
+  rm -f /tmp/pulse-*
+  pulseaudio --log-level=1 --log-target=stderr --disallow-exit=true --exit-idle-time=-1 &
+
   hciconfig hci0 sspmode 0
   hciconfig hci0 piscan
   sleep 2
-  bluetoothctl
-elif [ -z "$*" ]; then
-  wait
-else
-  exec sh -c "$*"
+  /app/bluetooth-connect.exp
+
+  sleep 5
+
+  paplay /tmp/test/test.wav
+
 fi

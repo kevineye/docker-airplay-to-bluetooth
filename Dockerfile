@@ -8,9 +8,14 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositor
         pulseaudio-bluez \
         pulseaudio-utils \
         pulseaudio-alsa \
+        expect \
  && echo 'load-module module-switch-on-connect' >> /etc/pulse/default.pa
 
-ADD app /app
+ENV HOME /root
 
-ENTRYPOINT [ "/app/init.sh" ]
-CMD [ ]
+ENV BT_DEVICE ""
+ENV BT_PIN "0000"
+
+CMD [ "/app/init.sh" ]
+
+ADD app /app

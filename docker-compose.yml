@@ -6,24 +6,16 @@ services:
     devices:
       - /dev/bus/usb # or set a specific device
     volumes:
+      - ./app:/app
       - ./devices:/var/lib/bluetooth
+      - ./test:/tmp/test
+      - ./config:/root/.config
+      - ./pulse:/root/.pulse
     network_mode: host
     cap_add:
       - NET_ADMIN
-
-  pair:
-    extends:
-      service: app
-    stdin_open: true
-    tty: true
-    command: pair
-
-  test-play:
-    extends:
-      service: app
-    volumes:
-      - ./test:/tmp/test
-    command: 'paplay /tmp/test/test.wav'
+    environment:
+      BT_DEVICE: B8:AD:3E:27:D0:8A
 
   shell:
     extends:
