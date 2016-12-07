@@ -53,6 +53,47 @@ if { $paired == False } {
 send_user "\n----> Attempting to connect\n"
 expect -re {(?:^|\r|\n).{0,8}\[bluetooth\].{0,8}# }
 send "connect $env(BT_DEVICE)\n"
+expect "Connection successful"
 expect -re {(?:^|\r|\n).{0,8}\[[^\]]+\].{0,8}# }
+send "exit\n"
 
 send_user "\n----> Connection successful\n"
+
+send_user "\n----> Ensuring A2DP\n"
+sleep 2
+regsub -all ":" "bluez_card.$env(BT_DEVICE)" "_" bluez_card
+set pa_cards [ exec pactl list cards ]
+regexp "\n\tName: $bluez_card\n.*?\n\tActive Profile: (.*?)\n" $pa_cards ignore pa_active_profile
+
+if { $pa_active_profile == "a2dp_sink" } {
+  send_user "\n----> A2DP connected\n"
+} else {
+
+  send_user "\n----> Switching profile to 'off'\n"
+  exec pactl set-card-profile $bluez_card off
+
+  send_user "\n----> Reconnecting\n"
+  spawn bluetoothctl
+  expect -re {(?:^|\r|\n).{0,8}\[[^\]]+\].{0,8}# }
+  send "disconnect $env(BT_DEVICE)\n"
+  expect "Successful disconnected"
+  expect -re {(?:^|\r|\n).{0,8}\[[^\]]+\].{0,8}# }
+  send "connect $env(BT_DEVICE)\n"
+  expect "Connection successful"
+  expect -re {(?:^|\r|\n).{0,8}\[[^\]]+\].{0,8}# }
+  send "exit\n"
+
+  send_user "\n----> Switching profile to 'a2dp_sink'\n"
+  sleep 2
+  exec pactl set-card-profile $bluez_card a2dp_sink
+
+  set pa_cards [ exec pactl list cards ]
+  regexp "\n\tName: $bluez_card\n.*?\n\tActive Profile: (.*?)\n" $pa_cards ignore pa_active_profile
+
+  if { $pa_active_profile == "a2dp_sink" } {
+    send_user "\n----> A2DP connected\n"
+  } else {
+    send_error "\n----> Could not confirm A2DP connection\n"
+  }
+
+}
