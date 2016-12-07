@@ -15,9 +15,12 @@ else
   rm -f /var/run/dbus.pid
   dbus-daemon --system --fork
 
+  rm -f /var/run/avahi-daemon/pid
+  avahi-daemon &
+
   /usr/lib/bluetooth/bluetoothd --plugin=a2dp -n &
 
-  rm -f /tmp/pulse-*
+  rm -f /tmp/pulse-* ~/.pulse/*-runtime
   pulseaudio --log-level=1 --log-target=stderr --disallow-exit=true --exit-idle-time=-1 &
 
   hciconfig hci0 sspmode 0
@@ -27,6 +30,6 @@ else
 
   sleep 5
 
-  paplay /tmp/test/test.wav
+  shairport-sync -a "$AIRPLAY_NAME" -o pulse
 
 fi
