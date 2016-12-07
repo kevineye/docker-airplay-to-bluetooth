@@ -6,16 +6,12 @@ services:
     devices:
       - /dev/bus/usb # or set a specific device
     volumes:
-      - ./app:/app
       - ./devices:/var/lib/bluetooth
-      - ./test:/tmp/test
-      - ./config:/root/.config
-      - ./pulse:/root/.pulse
     network_mode: host
     cap_add:
       - NET_ADMIN
     environment:
-      BT_DEVICE: B8:AD:3E:27:D0:8A
+      BT_DEVICE:
 
   shell:
     extends:
