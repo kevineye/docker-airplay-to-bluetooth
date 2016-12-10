@@ -1,4 +1,4 @@
-AirPlay music to a Bluetooth speaker. Uses shairport-sync so music played to multiple speakers (such as with iTunes or [forked-daapd](https://hub.docker.com/r/kevineye/shairport-sync/)).
+AirPlay music to a Bluetooth speaker.
 
 [![](https://images.microbadger.com/badges/image/kevineye/airplay-to-bluetooth.svg)](https://microbadger.com/images/kevineye/airplay-to-bluetooth "Get your own image badge on microbadger.com")
 
@@ -41,11 +41,11 @@ Make sure to put the bluetooth device in pairing mode the first time the contain
 
 This container is based on alpine linux, bluez5 bluetooth, pulseaudio, and [shairport-sync](https://github.com/mikebrady/shairport-sync) for AirPort  playback.
 
-Shairport-sync does not attempt to keep pulseaudio output synchronized as it does with ALSA, but bluez5 has deprecated ALSA support in favor of pulseaudio, so synchronized audio (i.e. among multiple airplay speakers simultaneously) is not really working.
+Shairport-sync does not attempt to keep pulseaudio output synchronized as it does with ALSA, but bluez5 has deprecated ALSA support in favor of pulseaudio, so synchronized audio (i.e. among multiple airplay speakers simultaneously) is not really possible with this configuration. In practice, the synchronization is pretty much random, off by up to a second ahead or behind.
 
 ## Todo
 
-* Support `audio_backend_latency_offset` shairport-sync option to improve audio sync
 * Test sharing host's bluetooth stack (/dev/hci) instead of controlling host's bluetooth hardware exclusively (/dev/usb)
 * Support pairing with and connecting to multiple bluetooth devices (or any discoverable bluetooth speaker).
 * Separate shairplay->pulseaudio and pulseaudio->bluetooth into separate containers
+* Work on synchronization, possibly by switching to bluez4 and alsa.
