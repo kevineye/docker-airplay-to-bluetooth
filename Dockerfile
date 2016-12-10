@@ -1,17 +1,10 @@
 FROM alpine:edge
 MAINTAINER Kevin Eye <kevineye@gmail.com>
 
-RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositories \
- && apk -U add \
-        bluez \
-        pulseaudio \
-        pulseaudio-bluez \
-        pulseaudio-utils \
-        pulseaudio-dev \
+RUN apk -U add \
         expect \
         build-base \
         curl \
-        alsa-lib-dev \
         libdaemon-dev \
         popt-dev \
         libressl-dev \
@@ -21,7 +14,33 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositor
         autoconf \
         automake \
         libtool \
- && echo 'load-module module-switch-on-connect' >> /etc/pulse/default.pa \
+        alsa-lib-dev \
+        alsa-utils \
+        bluez-dev \
+        bluez-libs \
+        bluez \
+        ortp-dev\
+        glib-dev \
+        libsndfile-dev \
+        linux-headers \
+ && cd /tmp \
+ && curl -L -O http://www.kernel.org/pub/linux/bluetooth/sbc-1.3.tar.xz \
+ && unxz sbc-1.3.tar.xz \
+ && tar xvf sbc-1.3.tar \
+ && cd sbc-1.3 \
+ && ./configure --prefix=/usr \
+ && make \
+ && make install \
+ && cd /tmp \
+ && curl -L -O https://github.com/Arkq/bluez-alsa/archive/master.zip \
+ && unzip master.zip \
+ && cd bluez-alsa-master \
+ && autoreconf --install \
+ && mkdir build
+RUN cd /tmp/bluez-alsa-master/build \
+ && ../configure --disable-hcitop \
+ && make \
+ && make install \
  && cd /tmp \
  && curl -L -O https://github.com/mikebrady/shairport-sync/archive/2.8.6.tar.gz \
  && tar xzvf 2.8.6.tar.gz\
@@ -37,11 +56,10 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositor
         --with-avahi \
         --with-ssl=openssl \
         --with-soxr \
-        --with-pulseaudio \
  && make \
  && make install \
- && cd / \
- && apk --purge del \
+ && cd /
+RUN apk --purge del \
         build-base \
         curl \
         alsa-lib-dev \
@@ -54,14 +72,21 @@ RUN echo http://dl-cdn.alpinelinux.org/alpine/edge/testing >> /etc/apk/repositor
         autoconf \
         automake \
         libtool \
-        pulseaudio-dev \
+        bluez-dev \
+        ortp-dev\
+        glib-dev \
+        libsndfile-dev \
+        linux-headers \
  && apk add \
         libdaemon \
         popt \
         soxr \
         libconfig \
         avahi \
-        pulseaudio-libs \
+        alsa-lib \
+        ortp \
+        glib \
+        libsndfile \
  && rm -rf /var/cache/apk* /lib/apk/db/* /etc/ssl /tmp/*
 
 ENV HOME /root

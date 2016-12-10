@@ -1,7 +1,7 @@
 version: "2"
 services:
   app:
-    image: kevineye/airplay-to-bluetooth
+    image: kevineye/airplay-to-bluetooth:bluez-alsa
     build: .
     devices:
       - /dev/bus/usb # or set a specific device
