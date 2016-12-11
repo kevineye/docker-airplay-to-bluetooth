@@ -1,0 +1,10 @@
+--- bluez-4.101-orig/tools/hciconfig.c
++++ bluez-4.101/tools/hciconfig.c
+@@ -37,6 +37,7 @@
+ #include <sys/param.h>
+ #include <sys/ioctl.h>
+ #include <sys/socket.h>
++#include <sys/stat.h>
+ 
+ #include <bluetooth/bluetooth.h>
+ #include <bluetooth/hci.h>
