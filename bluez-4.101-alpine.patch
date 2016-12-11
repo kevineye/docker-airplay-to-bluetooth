@@ -1,3 +1,13 @@
+--- bluez-4.101-orig/audio/ipc.h
++++ bluez-4.101/audio/ipc.h
+@@ -65,6 +65,7 @@
+ extern "C" {
+ #endif
+ 
++#include <string.h>
+ #include <stdint.h>
+ #include <stdio.h>
+ #include <unistd.h>
 --- bluez-4.101-orig/tools/hciconfig.c
 +++ bluez-4.101/tools/hciconfig.c
 @@ -37,6 +37,7 @@

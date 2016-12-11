@@ -3,26 +3,29 @@ MAINTAINER Kevin Eye <kevineye@gmail.com>
 
 #add #include <sys/stat.h> to tools/hciconfig.c
 
-RUN apk -U add build-base curl libusb-dev dbus-dev glib-dev alsa-lib-dev linux-headers libusb-compat-dev \
+RUN apk -U add build-base curl libusb-dev dbus-dev glib-dev alsa-lib-dev linux-headers libusb-compat-dev dbus py-gobject3 py-dbus alsa-utils \
  && rm -rf /usr/include/fortify \
- && cd /root \
+ && cd /tmp \
  && curl -L -O http://www.kernel.org/pub/linux/bluetooth/bluez-4.101.tar.xz \
  && unxz bluez-4.101.tar.xz \
  && tar xvf bluez-4.101.tar \
  && cd bluez-4.101 \
- && ./configure --enable-alsa --enable-usb --enable-tools --enable-test
+ && ./configure --prefix=/usr --sysconfdir=/etc --localstatedir=/var --libexecdir=/lib --enable-alsa --enable-usb --enable-tools --enable-test
 
 ADD bluez-4.101-alpine.patch /tmp/bluez-4.101-alpine.patch
 
-RUN cd /root/bluez-4.101 \
+RUN cd /tmp/bluez-4.101 \
  && patch -p1 < /tmp/bluez-4.101-alpine.patch
 
-RUN cd /root/bluez-4.101 \
+RUN cd /tmp/bluez-4.101 \
  && make \
- && make install
+ && make install \
+ && cp audio/bluetooth.conf /etc/asound.conf \
+ && cp audio/audio.conf /etc/bluetooth/audio.conf \
+ && cp test/simple-agent /usr/bin/bluez4-simple-agent \
+ && cp test/test-audio /usr/bin/bluez4-test-audio
 
 RUN apk -U add \
-        bluez \
         expect \
         build-base \
         curl \

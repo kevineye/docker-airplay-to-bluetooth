@@ -18,18 +18,15 @@ else
   rm -f /var/run/avahi-daemon/pid
   avahi-daemon &
 
-  /usr/lib/bluetooth/bluetoothd --plugin=a2dp -n &
-
-  rm -f /tmp/pulse-* ~/.pulse/*-runtime
-  pulseaudio --log-level=1 --log-target=stderr --disallow-exit=true --exit-idle-time=-1 &
+  /usr/sbin/bluetoothd -n &
 
   hciconfig hci0 sspmode 0
   hciconfig hci0 piscan
-  sleep 2
-  /app/bluetooth-connect.exp
 
-  sleep 5
+  bluez4-simple-agent hci0 "$BT_DEVICE" "$BT_PIN"
+  
+  aplay -D bluetooth /tmp/test/test.wav
 
-  shairport-sync -a "$AIRPLAY_NAME" -o pulse
+  # shairport-sync -a "$AIRPLAY_NAME" -o alsa -- -d bluetooth
 
 fi
