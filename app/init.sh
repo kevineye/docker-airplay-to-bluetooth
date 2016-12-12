@@ -20,8 +20,8 @@ else
 
   /usr/lib/bluetooth/bluetoothd --plugin=a2dp -n &
 
-  rm -f /tmp/pulse-* ~/.pulse/*-runtime
-  pulseaudio --log-level=1 --log-target=stderr --disallow-exit=true --exit-idle-time=-1 &
+  sed -i 's/device ".*"/device "'$BT_DEVICE'"/' /etc/asound.conf
+  /usr/bin/bluealsa &
 
   hciconfig hci0 sspmode 0
   hciconfig hci0 piscan
@@ -30,6 +30,6 @@ else
 
   sleep 5
 
-  shairport-sync -a "$AIRPLAY_NAME" -o pulse
+  shairport-sync -a "$AIRPLAY_NAME"
 
 fi

@@ -11,7 +11,7 @@ services:
     cap_add:
       - NET_ADMIN
     environment:
-      BT_DEVICE:
+      BT_DEVICE: 
 
   shell:
     extends:

@@ -98,4 +98,5 @@ ENV AIRPLAY_NAME "Docker"
 
 CMD [ "/app/init.sh" ]
 
+ADD asound.conf /etc/asound.conf
 ADD app /app
