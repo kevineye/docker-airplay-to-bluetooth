@@ -35,17 +35,16 @@ Make sure to put the bluetooth device in pairing mode the first time the contain
 * `-e AIRPLAY_NAME=Docker` set the AirPlay device name. Defaults to Docker
 * `-e BT_DEVICE=XX:XX:XX:XX:XX:XX` the Bluetooth device ID to connect to; leave blank to list available device IDs
 * `-e BT_PIN=0000` the PIN to use when pairing; usually the default 0000 will work
+* `-e BT_LATENCY_OFFSET=-2000` number of frames (i.e. 1/44100 of a second) to offset audio
 * `-v <local path>:/var/lib/bluetooth` provide a place to cache paired bluetooth device details; this is not absolutely necessary, but without it future launches of the container will attempt to re-pair with the bluetooth device, which often requires manual intervention on the device
 
 ### More Info
 
-This container is based on alpine linux, bluez5 bluetooth, pulseaudio, and [shairport-sync](https://github.com/mikebrady/shairport-sync) for AirPort  playback.
+This container is based on alpine linux, bluez5 bluetooth, [shairport-sync](https://github.com/mikebrady/shairport-sync), alsa and [bluez-alsa](https://github.com/Arkq/bluez-alsa).
 
-Shairport-sync does not attempt to keep pulseaudio output synchronized as it does with ALSA, but bluez5 has deprecated ALSA support in favor of pulseaudio, so synchronized audio (i.e. among multiple airplay speakers simultaneously) is not really possible with this configuration. In practice, the synchronization is pretty much random, off by up to a second ahead or behind.
+Audio synchronization among playing devices is pretty good. bluez-alsa does not reliably connect and crashes a lot.
 
 ## Todo
 
 * Test sharing host's bluetooth stack (/dev/hci) instead of controlling host's bluetooth hardware exclusively (/dev/usb)
 * Support pairing with and connecting to multiple bluetooth devices (or any discoverable bluetooth speaker).
-* Separate shairplay->pulseaudio and pulseaudio->bluetooth into separate containers
-* Work on synchronization, possibly by switching to bluez4 and alsa.
