@@ -93,10 +93,12 @@ ENV HOME /root
 
 ENV BT_DEVICE ""
 ENV BT_PIN "0000"
+ENV BT_LATENCY_OFFSET "-2000"
 
 ENV AIRPLAY_NAME "Docker"
 
 CMD [ "/app/init.sh" ]
 
 ADD asound.conf /etc/asound.conf
+ADD shairport-sync.conf /etc/shairport-sync.conf
 ADD app /app

@@ -30,6 +30,7 @@ else
 
   sleep 5
 
+  sed -i 's/audio_backend_latency_offset = .*;/audio_backend_latency_offset = '$BT_LATENCY_OFFSET';/g' /etc/shairport-sync.conf
   shairport-sync -a "$AIRPLAY_NAME"
 
 fi
